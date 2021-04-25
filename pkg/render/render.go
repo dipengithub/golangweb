@@ -3,6 +3,7 @@ package render
 import (
 	"bytes"
 	"fmt"
+	"github.com/dipengithub/golangweb/pkg/config"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -12,19 +13,22 @@ import (
 var functions = template.FuncMap{
 	
 }
+var app *config.AppConfig
+
+func NewTemplates(a *config.AppConfig)  {
+	app=a
+
+}
 
 func RenderTemplate(w http.ResponseWriter, tmpl string){
-	tc,err:=CreateTemplateCache()
-	if err!=nil{
-		log.Fatal(err)
-	}
+	tc:=app.TemplateCache
 	t,ok:=tc[tmpl]
 	if !ok{
-		log.Fatal(err)
+		log.Fatal("could not get template cache")
 	}
 	buf:=new(bytes.Buffer)
 	_=t.Execute(buf,nil)
-	_,err=buf.WriteTo(w)
+	_,err:=buf.WriteTo(w)
 	if err!=nil{
 		fmt.Println("error",err)
 	}
